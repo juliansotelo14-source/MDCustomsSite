@@ -1,120 +1,224 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>Admin – Orders</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #0b0d14; color: #eef2f8; }
-    header { display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; background: #111628; border-bottom: 1px solid #20283e; }
-    button { background: #e41c23; color: #0b0d14; border: none; border-radius: 10px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
-    .wrap { width: min(1100px, 92%); margin: 20px auto; }
-    table { width: 100%; border-collapse: collapse; border:1px solid #20283e; background:#131829; border-radius: 12px; overflow:hidden; }
-    th, td { padding: 10px 12px; border-bottom:1px solid #20283e; text-align: left; color: #cbd5e1; }
-    th { background:#0f1320; color:#fff; position:sticky; top:0; }
-    a { color:#fff; }
-    .muted { color:#a7b1c7; }
-  </style>
-</head>
-<body>
-<header>
-  <strong>Hollywood MD Customs — Admin</strong>
-  <div>
-    <button id="loginBtn">Log in</button>
-    <button id="logoutBtn" style="display:none;background:#20283e;color:#fff">Log out</button>
-  </div>
-</header>
-
-<div class="wrap">
-  <h2>Orders</h2>
-  <p id="status">Please sign in to view orders.</p>
-  <div style="overflow:auto; max-height: calc(100vh - 180px)">
-    <table id="orders" style="display:none">
-      <thead>
-        <tr>
-          <th>Date</th><th>Customer</th><th>Contact</th><th>Material</th>
-          <th>Size</th><th>Qty</th><th>Total</th><th>Ship To</th><th>Attachments</th><th>Status</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-  const statusEl = document.getElementById('status');
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const table = document.getElementById('orders');
-  const tbody = table.querySelector('tbody');
-
-  const widget = window.netlifyIdentity;
-
-  loginBtn.onclick = () => widget.open('login');
-  logoutBtn.onclick = () => widget.logout();
-
-  widget.on('login', () => {
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = 'inline-block';
-    widget.close();
-    loadOrders();
-  });
-
-  widget.on('logout', () => {
-    loginBtn.style.display = 'inline-block';
-    logoutBtn.style.display = 'none';
-    statusEl.textContent = 'Please sign in to view orders.';
-    table.style.display = 'none';
-    tbody.innerHTML = '';
-  });
-
-  async function loadOrders() {
-    statusEl.textContent = 'Loading orders…';
-    try {
-      const res = await fetch('/.netlify/functions/admin-list-orders', { credentials: 'include' });
-      if (!res.ok) {
-        statusEl.textContent = 'Access denied or error loading orders.';
-        return;
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin – Orders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script
+      defer
+      src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+    ></script>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        margin: 0;
+        background: #0b0d14;
+        color: #eef2f8;
       }
-      const items = await res.json();
-      tbody.innerHTML = items.map(o => {
-        const total = (o.amount_total_cents || 0) / 100;
-        const att = (o.attachments || '').split('|').filter(Boolean).map(u => `<div>${u}</div>`).join('') || '-';
-        const ship = (o.ship_to_address || '').replace(/\n/g,'<br>');
-        return `<tr>
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #111628;
+        border-bottom: 1px solid #20283e;
+      }
+      button {
+        background: #e41c23;
+        color: #0b0d14;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .wrap {
+        width: min(1100px, 92%);
+        margin: 20px auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #20283e;
+        background: #131829;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #20283e;
+        text-align: left;
+        color: #cbd5e1;
+      }
+      th {
+        background: #0f1320;
+        color: #fff;
+        position: sticky;
+        top: 0;
+      }
+      a {
+        color: #fff;
+      }
+      .muted {
+        color: #a7b1c7;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Hollywood MD Customs — Admin</strong>
+      <div>
+        <button id="loginBtn">Log in</button>
+        <button
+          id="logoutBtn"
+          style="display: none; background: #20283e; color: #fff"
+        >
+          Log out
+        </button>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <h2>Orders</h2>
+      <p id="status">Please sign in to view orders.</p>
+      <div style="overflow: auto; max-height: calc(100vh - 180px)">
+        <table id="orders" style="display: none">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Contact</th>
+              <th>Material</th>
+              <th>Size</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th>Ship To</th>
+              <th>Attachments</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const loginBtn = document.getElementById("loginBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const table = document.getElementById("orders");
+      const tbody = table.querySelector("tbody");
+
+      // Wait until Netlify Identity is fully available
+      function getIdentity() {
+        return new Promise((resolve) => {
+          (function check() {
+            if (
+              window.netlifyIdentity &&
+              typeof window.netlifyIdentity.on === "function"
+            ) {
+              resolve(window.netlifyIdentity);
+            } else {
+              setTimeout(check, 50);
+            }
+          })();
+        });
+      }
+
+      async function init() {
+        const widget = await getIdentity(); // <-- guarantees it's ready
+
+        // Wire buttons only after widget is ready
+        loginBtn.onclick = () => widget.open("login");
+        logoutBtn.onclick = () => widget.logout();
+
+        widget.on("login", () => {
+          loginBtn.style.display = "none";
+          logoutBtn.style.display = "inline-block";
+          widget.close();
+          loadOrders(); // after login, load data
+        });
+
+        widget.on("logout", () => {
+          loginBtn.style.display = "inline-block";
+          logoutBtn.style.display = "none";
+          statusEl.textContent = "Please sign in to view orders.";
+          table.style.display = "none";
+          tbody.innerHTML = "";
+        });
+
+        // If already logged in, load immediately
+        widget.on("init", (user) => {
+          if (user) {
+            loginBtn.style.display = "none";
+            logoutBtn.style.display = "inline-block";
+            loadOrders();
+          }
+        });
+
+        // Initialize the widget explicitly (safe even if already auto-inited)
+        if (typeof widget.init === "function") widget.init();
+      }
+
+      async function loadOrders() {
+        statusEl.textContent = "Loading orders…";
+        try {
+          const res = await fetch("/.netlify/functions/admin-list-orders", {
+            credentials: "include",
+          });
+          if (!res.ok) {
+            statusEl.textContent = "Access denied or error loading orders.";
+            return;
+          }
+          const items = await res.json();
+          const rows = items
+            .map((o) => {
+              const total = (o.amount_total_cents || 0) / 100;
+              const att =
+                (o.attachments || "")
+                  .split("|")
+                  .filter(Boolean)
+                  .map((u) => `<div>${u}</div>`)
+                  .join("") || "-";
+              const ship = (o.ship_to_address || "").replace(/\n/g, "<br>");
+              return `<tr>
           <td>${new Date(o.created_at).toLocaleString()}</td>
-          <td>${escapeHtml(o.customer_name || '')}</td>
-          <td>${escapeHtml(o.customer_email || '')}<br>${escapeHtml(o.phone || '')}</td>
-          <td>${escapeHtml(o.material_name || '')}</td>
+          <td>${esc(o.customer_name || "")}</td>
+          <td>${esc(o.customer_email || "")}<br>${esc(o.phone || "")}</td>
+          <td>${esc(o.material_name || "")}</td>
           <td>${Number(o.width_in || 0)}" × ${Number(o.height_in || 0)}"</td>
           <td>${Number(o.quantity || 1)}</td>
-          <td>$${total.toFixed(2)} ${String(o.currency || 'USD').toUpperCase()}</td>
-          <td class="muted">${ship || '-'}</td>
+          <td>$${total.toFixed(2)} ${String(
+                o.currency || "USD"
+              ).toUpperCase()}</td>
+          <td class="muted">${ship || "-"}</td>
           <td>${att}</td>
-          <td>${escapeHtml(o.status || '')}</td>
+          <td>${esc(o.status || "")}</td>
         </tr>`;
-      }).join('');
-      table.style.display = 'table';
-      statusEl.textContent = '';
-    } catch (e) {
-      console.error(e);
-      statusEl.textContent = 'Failed to load orders.';
-    }
-  }
+            })
+            .join("");
+          tbody.innerHTML = rows;
+          table.style.display = "table";
+          statusEl.textContent = "";
+        } catch (e) {
+          console.error(e);
+          statusEl.textContent = "Failed to load orders.";
+        }
+      }
 
-  function escapeHtml(s=''){
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-            .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  }
+      function esc(s = "") {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
 
-  widget.on('init', user => {
-    if (user) {
-      loginBtn.style.display = 'none';
-      logoutBtn.style.display = 'inline-block';
-      loadOrders();
-    }
-  });
-</script>
-</body>
+      // Kick it off
+      init();
+    </script>
+  </body>
 </html>
