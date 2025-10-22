@@ -65,9 +65,55 @@
       .muted {
         color: #a7b1c7;
       }
+      /* Debug bar */
+      .debug {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: #1b2238;
+        border-bottom: 1px dashed #334066;
+        padding: 6px 10px;
+        font-size: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .pill {
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #20283e;
+        color: #cbd5e1;
+      }
+      .ok {
+        background: #19361c;
+        color: #b7ffbf;
+      }
+      .bad {
+        background: #3a1a1a;
+        color: #ffb7b7;
+      }
+      .debug button {
+        padding: 4px 8px;
+        border-radius: 8px;
+        background: #20283e;
+        color: #fff;
+        border: 1px solid #334066;
+        cursor: pointer;
+      }
+      .debug button:hover {
+        filter: brightness(1.1);
+      }
     </style>
   </head>
   <body>
+    <div class="debug">
+      <span>Identity:</span>
+      <span id="idStatus" class="pill bad">NOT LOADED</span>
+      <button id="dbgLogin">Open Login</button>
+      <button id="dbgSignup">Open Signup</button>
+      <span id="hashInfo" class="pill"></span>
+    </div>
+
     <header>
       <strong>Hollywood MD Customs — Admin</strong>
       <div>
@@ -112,7 +158,18 @@
       const table = document.getElementById("orders");
       const tbody = table.querySelector("tbody");
 
-      // Wait until the Netlify Identity widget is present
+      // Debug handles
+      const idStatus = document.getElementById("idStatus");
+      const dbgLogin = document.getElementById("dbgLogin");
+      const dbgSignup = document.getElementById("dbgSignup");
+      const hashInfo = document.getElementById("hashInfo");
+      hashInfo.textContent = location.hash || "";
+
+      function setLoaded(ok) {
+        idStatus.textContent = ok ? "LOADED" : "NOT LOADED";
+        idStatus.className = "pill " + (ok ? "ok" : "bad");
+      }
+
       function getIdentity() {
         return new Promise((resolve) => {
           (function check() {
@@ -122,13 +179,13 @@
             ) {
               resolve(window.netlifyIdentity);
             } else {
-              setTimeout(check, 50);
+              setLoaded(false);
+              setTimeout(check, 80);
             }
           })();
         });
       }
 
-      // Escape helper
       function esc(s = "") {
         return s
           .replace(/&/g, "&amp;")
@@ -140,23 +197,24 @@
 
       async function init() {
         const id = await getIdentity();
+        setLoaded(true);
 
-        // Always initialize (safe if already initialized)
+        // Always init (safe)
         if (typeof id.init === "function") id.init();
 
-        // If URL has an invite token, open the signup popup so user can set password
-        if (
-          window.location.hash &&
-          /invite_token=/.test(window.location.hash)
-        ) {
-          id.open("signup");
-        }
+        // Wire debug buttons
+        dbgLogin.onclick = () => id.open("login");
+        dbgSignup.onclick = () => id.open("signup");
 
-        // Wire buttons
+        // Wire header buttons
         loginBtn.onclick = () => id.open("login");
         logoutBtn.onclick = () => id.logout();
 
-        // Events
+        // If invite token is present, force signup popup
+        if (location.hash && /invite_token=/.test(location.hash)) {
+          id.open("signup");
+        }
+
         id.on("login", async () => {
           loginBtn.style.display = "none";
           logoutBtn.style.display = "inline-block";
@@ -181,7 +239,6 @@
         });
       }
 
-      // Fetch orders WITH the user's JWT so the function sees your Identity (and roles)
       async function loadOrdersWithAuth(identity) {
         statusEl.textContent = "Loading orders…";
         try {
@@ -240,7 +297,6 @@
         }
       }
 
-      // Kick it off
       init();
     </script>
   </body>
