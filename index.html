@@ -286,9 +286,9 @@
     <script src="assets/js/main.js" defer></script>
     <script>
       (function () {
-        // If the homepage URL contains an invite_token, forward it to /admin.html
+        // If the homepage URL contains an invite_token, forward it to /identity.html
         if (location.hash && /invite_token=/.test(location.hash)) {
-          location.href = "/admin.html" + location.hash;
+          location.replace("/identity.html" + location.hash);
         }
       })();
     </script>

@@ -210,11 +210,6 @@
         loginBtn.onclick = () => id.open("login");
         logoutBtn.onclick = () => id.logout();
 
-        // If invite token is present, force signup popup
-        if (location.hash && /invite_token=/.test(location.hash)) {
-          id.open("signup");
-        }
-
         id.on("login", async () => {
           loginBtn.style.display = "none";
           logoutBtn.style.display = "inline-block";

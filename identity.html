@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Identity – Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- ONLY the widget, no extra CSS/JS to avoid conflicts -->
+    <script
+      defer
+      src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+    ></script>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+        margin: 0;
+        padding: 24px;
+      }
+      .box {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      .muted {
+        color: #666;
+      }
+      button {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: #f7f7f7;
+        cursor: pointer;
+      }
+      button:hover {
+        filter: brightness(0.98);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>Account Setup</h1>
+      <p class="muted">
+        If the signup dialog doesn’t appear, click the button below.
+      </p>
+      <button id="openSignup">Open Signup</button>
+      <p id="status" class="muted" style="margin-top: 12px"></p>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const openBtn = document.getElementById("openSignup");
+
+      function readyIdentity() {
+        return new Promise((resolve) => {
+          (function check() {
+            if (
+              window.netlifyIdentity &&
+              typeof window.netlifyIdentity.on === "function"
+            ) {
+              resolve(window.netlifyIdentity);
+            } else {
+              setTimeout(check, 50);
+            }
+          })();
+        });
+      }
+
+      (async function init() {
+        const id = await readyIdentity();
+        if (typeof id.init === "function") id.init();
+
+        // If an invite token is present, the widget can handle it directly.
+        const hasInvite = /invite_token=/.test(location.hash);
+        if (hasInvite) {
+          // Let the widget handle the token; if it doesn’t auto-open, user can click the button.
+          statusEl.textContent =
+            'Invite token detected. If the popup does not open automatically, click "Open Signup".';
+        } else {
+          statusEl.textContent =
+            "No invite token found. You can log in or sign up manually.";
+        }
+
+        // Manual open buttons
+        openBtn.onclick = () => id.open(hasInvite ? "signup" : "login");
+
+        // On login/signup success, send user to admin
+        id.on("login", () => {
+          id.close();
+          // clear hash to avoid re-triggering the flow later
+          window.location.replace("/admin.html");
+        });
+      })();
+    </script>
+  </body>
+</html>
