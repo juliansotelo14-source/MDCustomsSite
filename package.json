@@ -1,0 +1,11 @@
+{
+  "name": "mdcustoms-site",
+  "private": true,
+  "version": "1.7.0",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}

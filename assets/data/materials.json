@@ -1,0 +1,109 @@
+[
+  {
+    "id": "vinyl",
+    "name": "Vinyl",
+    "price": "from $8 / sq ft",
+    "base_rate": 8.0,
+    "min_price": 25,
+    "image": "assets/img/art/vinyl.svg",
+    "options": {
+      "hems": 0.5,
+      "grommets": 0.25
+    }
+  },
+  {
+    "id": "aluminum",
+    "name": "Aluminum",
+    "price": "from $15 / sq ft",
+    "base_rate": 15.0,
+    "min_price": 40,
+    "image": "assets/img/art/aluminum.svg",
+    "options": {
+      "rounded_corners": 5
+    }
+  },
+  {
+    "id": "jbond",
+    "name": "JBond (ACM)",
+    "price": "from $12 / sq ft",
+    "base_rate": 12.0,
+    "min_price": 35,
+    "image": "assets/img/art/jbond.svg",
+    "options": {
+      "laminate": 2.0
+    }
+  },
+  {
+    "id": "acrylic",
+    "name": "Acrylic",
+    "price": "from $18 / sq ft",
+    "base_rate": 18.0,
+    "min_price": 50,
+    "image": "assets/img/art/acrylic.svg",
+    "options": {
+      "standoffs": 10
+    }
+  },
+  {
+    "id": "posters",
+    "name": "Posters",
+    "price": "from $6 / sq ft",
+    "base_rate": 6.0,
+    "min_price": 15,
+    "image": "assets/img/art/posters.svg",
+    "options": {}
+  },
+  {
+    "id": "magnets",
+    "name": "Magnets",
+    "price": "from $10 / sq ft",
+    "base_rate": 10.0,
+    "min_price": 30,
+    "image": "assets/img/art/magnets.svg",
+    "options": {}
+  },
+  {
+    "id": "canvas",
+    "name": "Canvas",
+    "price": "from $14 / sq ft",
+    "base_rate": 14.0,
+    "min_price": 35,
+    "image": "assets/img/art/canvas.svg",
+    "options": {}
+  },
+  {
+    "id": "banners",
+    "name": "Banners",
+    "price": "from $7 / sq ft",
+    "base_rate": 7.0,
+    "min_price": 20,
+    "image": "assets/img/art/banners.svg",
+    "options": {
+      "hems": 0.5,
+      "grommets": 0.25,
+      "wind_slits": 1.0
+    }
+  },
+  {
+    "id": "business-cards",
+    "name": "Business Cards",
+    "price": "from $0.15 / card",
+    "base_rate": 0.15,
+    "min_price": 25,
+    "image": "assets/img/art/business-cards.svg",
+    "options": {
+      "spot_gloss": 0.05
+    }
+  },
+  {
+    "id": "yard-signs",
+    "name": "Yard Signs",
+    "price": "from $9 / sign",
+    "base_rate": 9.0,
+    "min_price": 20,
+    "image": "assets/img/art/yard-signs.svg",
+    "options": {
+      "h_stakes": 1.5
+    }
+  }
+]
