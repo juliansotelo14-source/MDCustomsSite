@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Admin – Orders</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Netlify Identity widget -->
     <script
       defer
       src="https://identity.netlify.com/v1/netlify-identity-widget.js"
@@ -111,7 +112,7 @@
       const table = document.getElementById("orders");
       const tbody = table.querySelector("tbody");
 
-      // Wait until Netlify Identity is fully available
+      // Wait until the Netlify Identity widget is present
       function getIdentity() {
         return new Promise((resolve) => {
           (function check() {
@@ -127,21 +128,43 @@
         });
       }
 
+      // Escape helper
+      function esc(s = "") {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
       async function init() {
-        const widget = await getIdentity(); // <-- guarantees it's ready
+        const id = await getIdentity();
 
-        // Wire buttons only after widget is ready
-        loginBtn.onclick = () => widget.open("login");
-        logoutBtn.onclick = () => widget.logout();
+        // Always initialize (safe if already initialized)
+        if (typeof id.init === "function") id.init();
 
-        widget.on("login", () => {
+        // If URL has an invite token, open the signup popup so user can set password
+        if (
+          window.location.hash &&
+          /invite_token=/.test(window.location.hash)
+        ) {
+          id.open("signup");
+        }
+
+        // Wire buttons
+        loginBtn.onclick = () => id.open("login");
+        logoutBtn.onclick = () => id.logout();
+
+        // Events
+        id.on("login", async () => {
           loginBtn.style.display = "none";
           logoutBtn.style.display = "inline-block";
-          widget.close();
-          loadOrders(); // after login, load data
+          id.close();
+          await loadOrdersWithAuth(id);
         });
 
-        widget.on("logout", () => {
+        id.on("logout", () => {
           loginBtn.style.display = "inline-block";
           logoutBtn.style.display = "none";
           statusEl.textContent = "Please sign in to view orders.";
@@ -149,29 +172,35 @@
           tbody.innerHTML = "";
         });
 
-        // If already logged in, load immediately
-        widget.on("init", (user) => {
+        id.on("init", async (user) => {
           if (user) {
             loginBtn.style.display = "none";
             logoutBtn.style.display = "inline-block";
-            loadOrders();
+            await loadOrdersWithAuth(id);
           }
         });
-
-        // Initialize the widget explicitly (safe even if already auto-inited)
-        if (typeof widget.init === "function") widget.init();
       }
 
-      async function loadOrders() {
+      // Fetch orders WITH the user's JWT so the function sees your Identity (and roles)
+      async function loadOrdersWithAuth(identity) {
         statusEl.textContent = "Loading orders…";
         try {
+          const user = identity.currentUser();
+          if (!user) {
+            statusEl.textContent = "Not logged in.";
+            return;
+          }
+          const token = await user.jwt();
+
           const res = await fetch("/.netlify/functions/admin-list-orders", {
-            credentials: "include",
+            headers: { Authorization: `Bearer ${token}` },
           });
+
           if (!res.ok) {
             statusEl.textContent = "Access denied or error loading orders.";
             return;
           }
+
           const items = await res.json();
           const rows = items
             .map((o) => {
@@ -184,21 +213,24 @@
                   .join("") || "-";
               const ship = (o.ship_to_address || "").replace(/\n/g, "<br>");
               return `<tr>
-          <td>${new Date(o.created_at).toLocaleString()}</td>
-          <td>${esc(o.customer_name || "")}</td>
-          <td>${esc(o.customer_email || "")}<br>${esc(o.phone || "")}</td>
-          <td>${esc(o.material_name || "")}</td>
-          <td>${Number(o.width_in || 0)}" × ${Number(o.height_in || 0)}"</td>
-          <td>${Number(o.quantity || 1)}</td>
-          <td>$${total.toFixed(2)} ${String(
+              <td>${new Date(o.created_at).toLocaleString()}</td>
+              <td>${esc(o.customer_name || "")}</td>
+              <td>${esc(o.customer_email || "")}<br>${esc(o.phone || "")}</td>
+              <td>${esc(o.material_name || "")}</td>
+              <td>${Number(o.width_in || 0)}" × ${Number(
+                o.height_in || 0
+              )}"</td>
+              <td>${Number(o.quantity || 1)}</td>
+              <td>$${total.toFixed(2)} ${String(
                 o.currency || "USD"
               ).toUpperCase()}</td>
-          <td class="muted">${ship || "-"}</td>
-          <td>${att}</td>
-          <td>${esc(o.status || "")}</td>
-        </tr>`;
+              <td class="muted">${ship || "-"}</td>
+              <td>${att}</td>
+              <td>${esc(o.status || "")}</td>
+            </tr>`;
             })
             .join("");
+
           tbody.innerHTML = rows;
           table.style.display = "table";
           statusEl.textContent = "";
@@ -208,47 +240,8 @@
         }
       }
 
-      function esc(s = "") {
-        return s
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-
       // Kick it off
       init();
-    </script>
-    <script>
-      (function initIdentity() {
-        function ready(fn) {
-          document.readyState !== "loading"
-            ? fn()
-            : document.addEventListener("DOMContentLoaded", fn);
-        }
-        ready(function () {
-          function start() {
-            const id = window.netlifyIdentity;
-            if (!id || typeof id.init !== "function") {
-              setTimeout(start, 50);
-              return;
-            }
-
-            // Initialize the widget (safe even if already inited)
-            id.init();
-
-            // If this URL has an invite token, open the signup popup
-            if (
-              window.location.hash &&
-              /invite_token=/.test(window.location.hash)
-            ) {
-              id.open("signup");
-            }
-          }
-          start();
-        });
-      })();
     </script>
   </body>
 </html>
