@@ -220,5 +220,35 @@
       // Kick it off
       init();
     </script>
+    <script>
+      (function initIdentity() {
+        function ready(fn) {
+          document.readyState !== "loading"
+            ? fn()
+            : document.addEventListener("DOMContentLoaded", fn);
+        }
+        ready(function () {
+          function start() {
+            const id = window.netlifyIdentity;
+            if (!id || typeof id.init !== "function") {
+              setTimeout(start, 50);
+              return;
+            }
+
+            // Initialize the widget (safe even if already inited)
+            id.init();
+
+            // If this URL has an invite token, open the signup popup
+            if (
+              window.location.hash &&
+              /invite_token=/.test(window.location.hash)
+            ) {
+              id.open("signup");
+            }
+          }
+          start();
+        });
+      })();
+    </script>
   </body>
 </html>
