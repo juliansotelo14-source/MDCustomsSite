@@ -1,127 +1,296 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Hollywood MD Customs — Custom Signs & Prints</title>
-  <meta name="description" content="Vinyl, Aluminum, ACM (JBond), Acrylic, Posters, Magnets, Canvas, Banners, Business Cards, Yard Signs."/>
-  <link rel="icon" href="assets/img/logo.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css"/>
-</head>
-<body>
-<header class="site-header">
-  <div class="container header-inner">
-    <a class="brand" href="#">
-      <img class="brand-mark" src="assets/img/logo.png" alt="Hollywood MD Customs logo"/>
-      <div class="brand-stack"><span class="brand-top">Hollywood</span><span class="brand-bottom">MD Customs</span></div>
-    </a>
-    <nav id="site-nav" class="site-nav" aria-label="Primary">
-      <ul><li><a href="#materials">Materials</a></li><li><a href="#artwork">Artwork</a></li><li><a href="#about">About</a></li><li><a href="/admin.html">Admin</a></li></ul>
-    </nav>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Toggle navigation">☰</button>
-  </div>
-</header>
-
-<main id="main">
-  <section class="hero">
-    <img class="hero-bg" src="assets/img/hero-bg.svg" alt="" aria-hidden="true"/>
-    <div class="container hero-wrap">
-      <div class="hero-copy">
-        <h1 class="display">Custom Signs. <span class="accent">Bold Prints.</span></h1>
-        <p class="lead">Premium signage and print work—designed for impact, built to last.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="#materials">Start a Custom Order</a>
-          <a class="btn" href="#artwork">Browse Artwork</a>
-        </div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hollywood MD Customs — Custom Signs & Prints</title>
+    <meta
+      name="description"
+      content="Vinyl, Aluminum, ACM (JBond), Acrylic, Posters, Magnets, Canvas, Banners, Business Cards, Yard Signs."
+    />
+    <link rel="icon" href="assets/img/logo.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script
+      defer
+      src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+    ></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#">
+          <img
+            class="brand-mark"
+            src="assets/img/logo.png"
+            alt="Hollywood MD Customs logo"
+          />
+          <div class="brand-stack">
+            <span class="brand-top">Hollywood</span
+            ><span class="brand-bottom">MD Customs</span>
+          </div>
+        </a>
+        <nav id="site-nav" class="site-nav" aria-label="Primary">
+          <ul>
+            <li><a href="#materials">Materials</a></li>
+            <li><a href="#artwork">Artwork</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="/admin.html">Admin</a></li>
+          </ul>
+        </nav>
+        <button
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          aria-label="Toggle navigation"
+        >
+          ☰
+        </button>
       </div>
-      <div class="hero-logo">
-        <img src="assets/img/logo.png" alt="Shop emblem" loading="lazy"/>
-      </div>
-    </div>
-  </section>
-
-  <section id="materials" class="section section-tight">
-    <div class="container">
-      <header class="section-head center"><h2 class="section-title">Materials & Products</h2><p class="muted">Click a material to customize, size and upload artwork.</p></header>
-      <div id="materials-grid" class="grid products"></div>
-    </div>
-  </section>
-
-  <section id="artwork" class="section section-alt">
-    <div class="container">
-      <header class="section-head center"><h2 class="section-title">Created Artwork for Sale</h2><p class="muted">Limited designs and originals. New drops regularly.</p></header>
-      <div id="gallery" class="grid gallery"></div>
-    </div>
-  </section>
-
-  <section id="about" class="section">
-    <div class="container narrow">
-      <header class="section-head center"><h2 class="section-title">About</h2></header>
-      <p>Hollywood MD Customs is your local sign and print shop focused on clean design, rugged materials, and fast turnarounds.</p>
-      <ul class="contact-cards">
-        <li><strong>Call</strong><br><a href="tel:520-535-9289">520-535-9289</a></li>
-        <li><strong>Email</strong><br><a href="mailto:Mike.devlieger7@gmail.com">Mike.devlieger7@gmail.com</a></li>
-        <li><strong>Website</strong><br><a href="https://www.MDCustoms.com" target="_blank" rel="noopener">www.MDCustoms.com</a></li>
-      </ul>
-    </div>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <div class="container footer-inner">
-    <p>© <span id="year"></span> Hollywood MD Customs. All rights reserved.</p>
-    <ul class="footer-links"><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li></ul>
-  </div>
-</footer>
-
-<!-- Drawer -->
-<div id="mdc-drawer" class="mdc-drawer" aria-hidden="true">
-  <div class="mdc-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="mdc-drawer-title">
-    <button class="mdc-drawer__close" aria-label="Close">✕</button>
-    <header class="mdc-drawer__head">
-      <h3 id="mdc-drawer-title">Start Your Order</h3>
-      <p class="muted" id="mdc-drawer-sub">Choose size, quantity, options, upload artwork, and shipping address.</p>
     </header>
 
-    <form id="order-form" class="mdc-calc">
-      <input type="hidden" id="mdc-material-id" />
-      <input type="hidden" id="mdc-material-name" />
+    <main id="main">
+      <section class="hero">
+        <img
+          class="hero-bg"
+          src="assets/img/hero-bg.svg"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="container hero-wrap">
+          <div class="hero-copy">
+            <h1 class="display">
+              Custom Signs. <span class="accent">Bold Prints.</span>
+            </h1>
+            <p class="lead">
+              Premium signage and print work—designed for impact, built to last.
+            </p>
+            <div class="actions">
+              <a class="btn btn-primary" href="#materials"
+                >Start a Custom Order</a
+              >
+              <a class="btn" href="#artwork">Browse Artwork</a>
+            </div>
+          </div>
+          <div class="hero-logo">
+            <img src="assets/img/logo.png" alt="Shop emblem" loading="lazy" />
+          </div>
+        </div>
+      </section>
 
-      <div class="grid two">
-        <label><span>Full Name</span><input name="name" type="text" placeholder="Your name" required></label>
-        <label><span>Email</span><input name="email" type="email" placeholder="you@example.com" required></label>
+      <section id="materials" class="section section-tight">
+        <div class="container">
+          <header class="section-head center">
+            <h2 class="section-title">Materials & Products</h2>
+            <p class="muted">
+              Click a material to customize, size and upload artwork.
+            </p>
+          </header>
+          <div id="materials-grid" class="grid products"></div>
+        </div>
+      </section>
+
+      <section id="artwork" class="section section-alt">
+        <div class="container">
+          <header class="section-head center">
+            <h2 class="section-title">Created Artwork for Sale</h2>
+            <p class="muted">
+              Limited designs and originals. New drops regularly.
+            </p>
+          </header>
+          <div id="gallery" class="grid gallery"></div>
+        </div>
+      </section>
+
+      <section id="about" class="section">
+        <div class="container narrow">
+          <header class="section-head center">
+            <h2 class="section-title">About</h2>
+          </header>
+          <p>
+            Hollywood MD Customs is your local sign and print shop focused on
+            clean design, rugged materials, and fast turnarounds.
+          </p>
+          <ul class="contact-cards">
+            <li>
+              <strong>Call</strong><br /><a href="tel:520-535-9289"
+                >520-535-9289</a
+              >
+            </li>
+            <li>
+              <strong>Email</strong><br /><a
+                href="mailto:Mike.devlieger7@gmail.com"
+                >Mike.devlieger7@gmail.com</a
+              >
+            </li>
+            <li>
+              <strong>Website</strong><br /><a
+                href="https://www.MDCustoms.com"
+                target="_blank"
+                rel="noopener"
+                >www.MDCustoms.com</a
+              >
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>
+          © <span id="year"></span> Hollywood MD Customs. All rights reserved.
+        </p>
+        <ul class="footer-links">
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
       </div>
-      <label><span>Phone</span><input name="phone" type="tel" placeholder="520-535-9289"></label>
+    </footer>
 
-      <div class="grid two">
-        <label><span>Width (inches)</span><input type="number" id="mdc-w" min="1" step="0.25" placeholder="24" required></label>
-        <label><span>Height (inches)</span><input type="number" id="mdc-h" min="1" step="0.25" placeholder="36" required></label>
+    <!-- Drawer -->
+    <div id="mdc-drawer" class="mdc-drawer" aria-hidden="true">
+      <div
+        class="mdc-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mdc-drawer-title"
+      >
+        <button class="mdc-drawer__close" aria-label="Close">✕</button>
+        <header class="mdc-drawer__head">
+          <h3 id="mdc-drawer-title">Start Your Order</h3>
+          <p class="muted" id="mdc-drawer-sub">
+            Choose size, quantity, options, upload artwork, and shipping
+            address.
+          </p>
+        </header>
+
+        <form id="order-form" class="mdc-calc">
+          <input type="hidden" id="mdc-material-id" />
+          <input type="hidden" id="mdc-material-name" />
+
+          <div class="grid two">
+            <label
+              ><span>Full Name</span
+              ><input name="name" type="text" placeholder="Your name" required
+            /></label>
+            <label
+              ><span>Email</span
+              ><input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+            /></label>
+          </div>
+          <label
+            ><span>Phone</span
+            ><input name="phone" type="tel" placeholder="520-535-9289"
+          /></label>
+
+          <div class="grid two">
+            <label
+              ><span>Width (inches)</span
+              ><input
+                type="number"
+                id="mdc-w"
+                min="1"
+                step="0.25"
+                placeholder="24"
+                required
+            /></label>
+            <label
+              ><span>Height (inches)</span
+              ><input
+                type="number"
+                id="mdc-h"
+                min="1"
+                step="0.25"
+                placeholder="36"
+                required
+            /></label>
+          </div>
+          <label
+            ><span>Quantity</span
+            ><input type="number" id="mdc-q" min="1" value="1" required
+          /></label>
+
+          <fieldset id="mdc-opts" class="mdc-opts">
+            <legend>Options</legend>
+          </fieldset>
+
+          <label
+            ><span>Upload Artwork</span
+            ><input
+              id="mdc-files"
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.png,.pdf,.ai,.svg,.eps,.zip"
+          /></label>
+          <div class="dropzone" id="mdc-drop">
+            <div>Drag & drop files here, or click to select.</div>
+            <div class="previews"></div>
+          </div>
+
+          <label
+            ><span>Ship To Address</span
+            ><textarea
+              id="mdc-ship"
+              rows="4"
+              placeholder="Name&#10;Street address&#10;City, State ZIP&#10;Country"
+              required
+            ></textarea>
+          </label>
+
+          <label
+            ><span>Notes</span
+            ><textarea
+              name="details"
+              rows="4"
+              placeholder="Color notes, lamination, install, deadline…"
+            ></textarea>
+          </label>
+
+          <div class="mdc-est">
+            <div>
+              <div class="muted small">Est. Area</div>
+              <strong id="mdc-area">0.00 sq ft</strong>
+            </div>
+            <div>
+              <div class="muted small">Est. Total</div>
+              <strong id="mdc-price">$0.00</strong>
+            </div>
+            <div>
+              <div class="muted small">Per Item</div>
+              <strong id="mdc-each">$0.00</strong>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Checkout
+          </button>
+          <p
+            id="form-status"
+            class="muted"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
       </div>
-      <label><span>Quantity</span><input type="number" id="mdc-q" min="1" value="1" required></label>
+      <div class="mdc-drawer__backdrop"></div>
+    </div>
 
-      <fieldset id="mdc-opts" class="mdc-opts"><legend>Options</legend></fieldset>
-
-      <label><span>Upload Artwork</span><input id="mdc-files" type="file" multiple accept=".jpg,.jpeg,.png,.pdf,.ai,.svg,.eps,.zip"></label>
-      <div class="dropzone" id="mdc-drop"><div>Drag & drop files here, or click to select.</div><div class="previews"></div></div>
-
-      <label><span>Ship To Address</span><textarea id="mdc-ship" rows="4" placeholder="Name&#10;Street address&#10;City, State ZIP&#10;Country" required></textarea></label>
-
-      <label><span>Notes</span><textarea name="details" rows="4" placeholder="Color notes, lamination, install, deadline…"></textarea></label>
-
-      <div class="mdc-est">
-        <div><div class="muted small">Est. Area</div><strong id="mdc-area">0.00 sq ft</strong></div>
-        <div><div class="muted small">Est. Total</div><strong id="mdc-price">$0.00</strong></div>
-        <div><div class="muted small">Per Item</div><strong id="mdc-each">$0.00</strong></div>
-      </div>
-
-      <button type="submit" class="btn btn-primary" style="width:100%">Checkout</button>
-      <p id="form-status" class="muted" role="status" aria-live="polite"></p>
-    </form>
-  </div>
-  <div class="mdc-drawer__backdrop"></div>
-</div>
-
-<script src="assets/js/main.js" defer></script>
-</body>
+    <script src="assets/js/main.js" defer></script>
+    <script>
+      (function () {
+        // If the homepage URL contains an invite_token, forward it to /admin.html
+        if (location.hash && /invite_token=/.test(location.hash)) {
+          location.href = "/admin.html" + location.hash;
+        }
+      })();
+    </script>
+  </body>
 </html>
