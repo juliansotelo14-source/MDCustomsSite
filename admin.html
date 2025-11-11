@@ -103,6 +103,32 @@
       .debug button:hover {
         filter: brightness(1.1);
       }
+      /* Artwork manager form */
+      #art-form {
+        margin-bottom: 20px;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        background: #111628;
+        padding: 16px;
+        border-radius: 12px;
+      }
+      #art-form label span {
+        font-size: 13px;
+        color: #a7b1c7;
+      }
+      #art-form input {
+        width: 100%;
+        margin-top: 4px;
+        border-radius: 8px;
+        border: 1px solid #20283e;
+        padding: 6px 8px;
+        background: #0b0d14;
+        color: #eef2f8;
+      }
+      #art-form button {
+        padding: 8px 14px;
+      }
     </style>
   </head>
   <body>
@@ -127,6 +153,7 @@
       </div>
     </header>
 
+    <!-- ORDERS SECTION -->
     <div class="wrap">
       <h2>Orders</h2>
       <p id="status">Please sign in to view orders.</p>
@@ -151,6 +178,88 @@
       </div>
     </div>
 
+    <hr
+      style="margin: 32px auto; width: min(1100px, 92%); border-color: #20283e"
+    />
+
+    <!-- ARTWORK MANAGER SECTION -->
+    <section class="wrap">
+      <h2>Artwork Manager</h2>
+      <p class="muted">
+        Add or remove pieces from the public "Created Artwork for Sale" gallery.
+      </p>
+
+      <form id="art-form">
+        <label>
+          <span>Title</span><br />
+          <input type="text" name="title" required />
+        </label>
+        <label>
+          <span>Price (display)</span><br />
+          <input type="text" name="price" placeholder="$120" />
+        </label>
+        <label>
+          <span>Size</span><br />
+          <input type="text" name="size" placeholder='24" x 36"' />
+        </label>
+        <label>
+          <span>Materials (comma separated)</span><br />
+          <input type="text" name="materials" placeholder="Canvas, Acrylic" />
+        </label>
+        <label style="grid-column: 1 / -1">
+          <span>Image URL</span><br />
+          <input
+            type="url"
+            name="image_url"
+            placeholder="https://..."
+            required
+          />
+        </label>
+        <label style="grid-column: 1 / -1">
+          <span>Buy URL (optional)</span><br />
+          <input type="url" name="buy_url" placeholder="https://..." />
+        </label>
+        <div
+          style="
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+          "
+        >
+          <button type="submit">Add Artwork</button>
+          <span id="art-status" class="muted"></span>
+        </div>
+      </form>
+
+      <div style="overflow: auto; max-height: 400px">
+        <table
+          id="art-table"
+          style="
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #20283e;
+            background: #131829;
+            border-radius: 12px;
+            overflow: hidden;
+          "
+        >
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Size</th>
+              <th>Materials</th>
+              <th>Image</th>
+              <th>Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
     <script>
       const statusEl = document.getElementById("status");
       const loginBtn = document.getElementById("loginBtn");
@@ -158,12 +267,20 @@
       const table = document.getElementById("orders");
       const tbody = table.querySelector("tbody");
 
+      // Artwork manager handles
+      const artForm = document.getElementById("art-form");
+      const artStatus = document.getElementById("art-status");
+      const artTable = document.getElementById("art-table");
+      const artTbody = artTable ? artTable.querySelector("tbody") : null;
+
       // Debug handles
       const idStatus = document.getElementById("idStatus");
       const dbgLogin = document.getElementById("dbgLogin");
       const dbgSignup = document.getElementById("dbgSignup");
       const hashInfo = document.getElementById("hashInfo");
       hashInfo.textContent = location.hash || "";
+
+      let currentIdentity = null;
 
       function setLoaded(ok) {
         idStatus.textContent = ok ? "LOADED" : "NOT LOADED";
@@ -195,8 +312,20 @@
           .replace(/'/g, "&#039;");
       }
 
+      async function getAuthHeaders() {
+        if (!currentIdentity) throw new Error("No identity");
+        const user = currentIdentity.currentUser();
+        if (!user) throw new Error("Not logged in");
+        const token = await user.jwt();
+        return {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        };
+      }
+
       async function init() {
         const id = await getIdentity();
+        currentIdentity = id;
         setLoaded(true);
 
         // Always init (safe)
@@ -214,7 +343,8 @@
           loginBtn.style.display = "none";
           logoutBtn.style.display = "inline-block";
           id.close();
-          await loadOrdersWithAuth(id);
+          await loadOrdersWithAuth();
+          await loadAdminArtworks();
         });
 
         id.on("logout", () => {
@@ -223,21 +353,29 @@
           statusEl.textContent = "Please sign in to view orders.";
           table.style.display = "none";
           tbody.innerHTML = "";
+          if (artTbody) artTbody.innerHTML = "";
+          if (artStatus)
+            artStatus.textContent = "Please sign in to manage artwork.";
         });
 
         id.on("init", async (user) => {
           if (user) {
             loginBtn.style.display = "none";
             logoutBtn.style.display = "inline-block";
-            await loadOrdersWithAuth(id);
+            await loadOrdersWithAuth();
+            await loadAdminArtworks();
           }
         });
       }
 
-      async function loadOrdersWithAuth(identity) {
+      async function loadOrdersWithAuth() {
         statusEl.textContent = "Loading orders…";
         try {
-          const user = identity.currentUser();
+          if (!currentIdentity) {
+            statusEl.textContent = "Not logged in.";
+            return;
+          }
+          const user = currentIdentity.currentUser();
           if (!user) {
             statusEl.textContent = "Not logged in.";
             return;
@@ -245,7 +383,7 @@
           const token = await user.jwt();
 
           const res = await fetch("/.netlify/functions/admin-list-orders", {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: "Bearer " + token },
           });
 
           if (!res.ok) {
@@ -290,6 +428,115 @@
           console.error(e);
           statusEl.textContent = "Failed to load orders.";
         }
+      }
+
+      // ===== Artwork Manager functions =====
+      async function loadAdminArtworks() {
+        if (!artTbody || !artStatus) return;
+        artStatus.textContent = "Loading artworks…";
+        try {
+          const headers = await getAuthHeaders();
+          // For GET, we don't need Content-Type
+          delete headers["Content-Type"];
+
+          const res = await fetch("/.netlify/functions/admin-artworks", {
+            headers,
+          });
+          if (!res.ok) {
+            artStatus.textContent = "Failed to load artworks.";
+            return;
+          }
+          const items = await res.json();
+          artTbody.innerHTML = items
+            .map(
+              (a) => `
+            <tr>
+              <td>${esc(a.title || "")}</td>
+              <td>${esc(a.price || "")}</td>
+              <td>${esc(a.size || "")}</td>
+              <td>${esc((a.materials || []).join(", "))}</td>
+              <td><a href="${esc(
+                a.image_url || "#"
+              )}" target="_blank" rel="noopener">View</a></td>
+              <td>${a.is_active ? "Yes" : "No"}</td>
+              <td>
+                <button data-art-id="${esc(
+                  a.id
+                )}" style="padding:4px 8px;font-size:12px;border-radius:8px;background:#20283e;color:#fff;border:1px solid #334066">
+                  Remove
+                </button>
+              </td>
+            </tr>`
+            )
+            .join("");
+          artStatus.textContent = "";
+        } catch (e) {
+          console.error(e);
+          artStatus.textContent = "Failed to load artworks.";
+        }
+      }
+
+      if (artForm && artStatus) {
+        artForm.onsubmit = async (e) => {
+          e.preventDefault();
+          artStatus.textContent = "Saving…";
+
+          const formData = new FormData(artForm);
+          const payload = {
+            title: formData.get("title"),
+            price: formData.get("price"),
+            size: formData.get("size"),
+            materials: String(formData.get("materials") || "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+            image_url: formData.get("image_url"),
+            buy_url: formData.get("buy_url"),
+            is_active: true,
+          };
+
+          try {
+            const headers = await getAuthHeaders();
+            const res = await fetch("/.netlify/functions/admin-artworks", {
+              method: "POST",
+              headers,
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error("Save failed");
+            artForm.reset();
+            artStatus.textContent = "Artwork added.";
+            await loadAdminArtworks();
+          } catch (e) {
+            console.error(e);
+            artStatus.textContent = "Failed to add artwork.";
+          }
+        };
+      }
+
+      if (artTbody && artStatus) {
+        artTbody.addEventListener("click", async (e) => {
+          const btn = e.target.closest("button[data-art-id]");
+          if (!btn) return;
+          const id = btn.getAttribute("data-art-id");
+          if (!id) return;
+          if (!confirm("Remove this artwork from the public gallery?")) return;
+
+          artStatus.textContent = "Removing…";
+          try {
+            const headers = await getAuthHeaders();
+            const res = await fetch("/.netlify/functions/admin-artworks", {
+              method: "DELETE",
+              headers,
+              body: JSON.stringify({ id }),
+            });
+            if (!res.ok) throw new Error("Delete failed");
+            artStatus.textContent = "Artwork removed.";
+            await loadAdminArtworks();
+          } catch (e) {
+            console.error(e);
+            artStatus.textContent = "Failed to remove artwork.";
+          }
+        });
       }
 
       init();

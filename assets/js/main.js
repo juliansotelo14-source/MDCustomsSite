@@ -80,24 +80,26 @@ async function loadGallery() {
   const el = document.getElementById("gallery");
   if (!el) return;
   try {
-    const res = await fetch("assets/data/artworks.json");
+    const res = await fetch("/.netlify/functions/list-artworks");
     const items = await res.json();
     el.innerHTML = items
       .map(
         (i) => `
       <article class="card tile">
-        <a class="thumb" href="${esc(i.image)}" target="_blank" rel="noopener">
-          <img class="card-img" src="${esc(i.image)}" alt="${esc(
+        <a class="thumb" href="${esc(
+          i.image_url
+        )}" target="_blank" rel="noopener">
+          <img class="card-img" src="${esc(i.image_url)}" alt="${esc(
           i.title
         )}" loading="lazy"/>
         </a>
         <div>
           <h3>${esc(i.title)}</h3>
-          <p class="muted">${esc(i.size)} • ${esc(
+          <p class="muted">${esc(i.size || "")} • ${esc(
           (i.materials || []).join(", ")
         )}</p>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <strong>${esc(i.price)}</strong>
+            <strong>${esc(i.price || "")}</strong>
             ${
               i.buy_url
                 ? `<a class="btn btn-primary" href="${esc(
