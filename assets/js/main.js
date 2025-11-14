@@ -13,8 +13,7 @@ const currency = (n) => "$" + Number(n || 0).toFixed(2);
 
 /* =============== HELPERS =============== */
 function priceLabel(m) {
-  // Support new pricing schema, but fall back to legacy m.price if present
-  if (m?.price) return m.price;
+  if (m?.price) return m.price; // legacy label fallback
   const p = m?.pricing || {};
   switch (p.unit) {
     case "sqin":
@@ -48,7 +47,10 @@ async function loadMaterials() {
   const wrap = document.getElementById("materials-grid");
   if (!wrap) return;
   try {
-    const res = await fetch("assets/data/materials.json");
+    const res = await fetch("assets/data/materials.json", {
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`materials.json HTTP ${res.status}`);
     const items = await res.json();
     window.MATERIALS = items;
     wrap.innerHTML = items
@@ -69,7 +71,7 @@ async function loadMaterials() {
       )
       .join("");
   } catch (e) {
-    console.error(e);
+    console.error("materials load error:", e);
     wrap.innerHTML = "<p>Could not load materials.</p>";
   }
 }
@@ -80,26 +82,25 @@ async function loadGallery() {
   const el = document.getElementById("gallery");
   if (!el) return;
   try {
-    const res = await fetch("/.netlify/functions/list-artworks");
+    const res = await fetch("assets/data/artworks.json", { cache: "no-store" });
+    if (!res.ok) throw new Error(`artworks.json HTTP ${res.status}`);
     const items = await res.json();
     el.innerHTML = items
       .map(
         (i) => `
       <article class="card tile">
-        <a class="thumb" href="${esc(
-          i.image_url
-        )}" target="_blank" rel="noopener">
-          <img class="card-img" src="${esc(i.image_url)}" alt="${esc(
+        <a class="thumb" href="${esc(i.image)}" target="_blank" rel="noopener">
+          <img class="card-img" src="${esc(i.image)}" alt="${esc(
           i.title
         )}" loading="lazy"/>
         </a>
         <div>
           <h3>${esc(i.title)}</h3>
-          <p class="muted">${esc(i.size || "")} • ${esc(
+          <p class="muted">${esc(i.size)} • ${esc(
           (i.materials || []).join(", ")
         )}</p>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <strong>${esc(i.price || "")}</strong>
+            <strong>${esc(i.price)}</strong>
             ${
               i.buy_url
                 ? `<a class="btn btn-primary" href="${esc(
@@ -115,7 +116,7 @@ async function loadGallery() {
       )
       .join("");
   } catch (e) {
-    console.error(e);
+    console.error("artworks load error:", e);
     el.innerHTML = "<p>Could not load artwork.</p>";
   }
 }
@@ -126,7 +127,7 @@ document.addEventListener("click", async (e) => {
   const card = e.target.closest(".products .card[data-material-id]");
   if (!card) return;
   if (!window.MATERIALS) {
-    const r = await fetch("assets/data/materials.json");
+    const r = await fetch("assets/data/materials.json", { cache: "no-store" });
     window.MATERIALS = await r.json();
   }
   openDrawer(
@@ -135,7 +136,7 @@ document.addEventListener("click", async (e) => {
   );
 });
 
-/* =============== DRAWER + PRICING + UPLOADS =============== */
+/* =============== DRAWER + PRICING =============== */
 function openDrawer(materialId, materialName) {
   const root = document.getElementById("mdc-drawer");
   let backdrop = root.querySelector(".mdc-drawer__backdrop");
@@ -162,9 +163,14 @@ function openDrawer(materialId, materialName) {
   const priceEl = document.getElementById("mdc-price");
   const eachEl = document.getElementById("mdc-each");
 
-  const filesInput = document.getElementById("mdc-files");
+  const filesInput = document.getElementById("mdc-files"); // ← declare ONCE
   const drop = document.getElementById("mdc-drop");
-  const previews = drop.querySelector(".previews");
+
+  // tolerate missing <select> gracefully
+  const methodSel = document.getElementById("mdc-ship-method") || {
+    value: "pickup",
+    addEventListener: () => {},
+  };
 
   const ship = document.getElementById("mdc-ship");
   const form = document.getElementById("order-form");
@@ -176,23 +182,22 @@ function openDrawer(materialId, materialName) {
   matId.value = materialId;
   matName.value = materialName;
 
-  // Default inputs
+  // Defaults
   if (!w.value) w.value = 24;
   if (!h.value) h.value = 36;
   if (!q.value) q.value = 1;
 
-  /* ------ UI toggles for size + quantity label ------ */
+  // UI toggles for size vs sheet/pack products
   const showSize = mat?.ui?.showSize !== false; // default true
   const wLabel = w.closest("label");
   const hLabel = h.closest("label");
   if (wLabel) wLabel.style.display = showSize ? "" : "none";
   if (hLabel) hLabel.style.display = showSize ? "" : "none";
-
   const qtyLabelSpan = q.closest("label")?.querySelector("span");
   if (qtyLabelSpan)
     qtyLabelSpan.textContent = mat?.ui?.quantityLabel || "Quantity";
 
-  /* ------ Options (per sq ft if <2, else per item flat) ------ */
+  // Options
   optsWrap.innerHTML = "<legend>Options</legend>";
   const labelMap = {
     hems: "Hems",
@@ -213,7 +218,32 @@ function openDrawer(materialId, materialName) {
     optsWrap.appendChild(el);
   });
 
-  /* ------ Pricing ------ */
+  // === Delivery pricing (per item) ===
+  const SHIP_RATES = { pickup: 0, meet: 5, ship: 10 };
+  function deliveryCost(quantity, method) {
+    const rate = SHIP_RATES[method] ?? 0;
+    return Math.max(1, Number(quantity || 1)) * rate;
+  }
+  function updateShipAddressRequirement() {
+    const m = methodSel.value;
+    if (ship && ship.closest) {
+      if (m === "ship") {
+        ship.required = true;
+        ship.closest("label").style.display = "";
+      } else {
+        ship.required = false;
+        ship.closest("label").style.display = m ? "none" : "";
+      }
+    }
+  }
+  methodSel.addEventListener("change", () => {
+    updateShipAddressRequirement();
+    renderEstimate();
+  });
+  if (!methodSel.value) methodSel.value = "pickup";
+  updateShipAddressRequirement();
+
+  // Pricing helpers
   function calcPrice(material, widthIn, heightIn, quantity, optionsCost = 0) {
     const unit = material?.pricing?.unit;
     const rate = Number(material?.pricing?.rate || 0);
@@ -242,7 +272,6 @@ function openDrawer(materialId, materialName) {
     const each = quantity > 0 ? total / quantity : total;
     return { areaSqIn, areaSqFt, total, each };
   }
-
   function selectedOptionsCost(widthIn, heightIn, quantity) {
     let cost = 0;
     const areaSqFtPerItem =
@@ -253,13 +282,8 @@ function openDrawer(materialId, materialName) {
       .forEach((cb) => {
         const key = cb.dataset.opt;
         const v = Number((mat.options || {})[key] || 0);
-        if (v < 2) {
-          // per sq ft
-          cost += v * areaSqFtPerItem * quantity;
-        } else {
-          // flat per item
-          cost += v * quantity;
-        }
+        if (v < 2) cost += v * areaSqFtPerItem * quantity; // per sq ft
+        else cost += v * quantity; // per item
       });
     return cost;
   }
@@ -269,44 +293,44 @@ function openDrawer(materialId, materialName) {
     const heightIn = Number(h.value || 0);
     const qty = Math.max(1, parseInt(q.value || "1", 10));
     const optCost = selectedOptionsCost(widthIn, heightIn, qty);
+
     const calc = calcPrice(mat, widthIn, heightIn, qty, optCost);
 
-    // Area line for size products; dash for per-sheet/pack
+    const method = methodSel.value || "pickup";
+    const shipFeeTotal = deliveryCost(qty, method);
+
+    const grandTotal = calc.total + shipFeeTotal;
+    const perItem = qty > 0 ? grandTotal / qty : grandTotal;
+
     areaEl.textContent =
       mat?.ui?.showSize === false
         ? "—"
         : `${calc.areaSqFt.toFixed(2)} sq ft (${calc.areaSqIn.toFixed(
             0
           )} sq in)`;
-    eachEl.textContent = currency(calc.each);
-    priceEl.textContent = currency(calc.total);
+    eachEl.textContent = currency(perItem);
+    priceEl.textContent = currency(grandTotal);
   }
 
-  // Initial render & listeners
   renderEstimate();
   [w, h, q].forEach(
     (inp) => inp && inp.addEventListener("input", renderEstimate)
   );
   optsWrap.addEventListener("change", renderEstimate);
 
-  /* ------ File previews + tracking selectedFiles ------ */
+  // File previews (filenames only)
   const dropClone = drop.cloneNode(true);
   drop.parentNode.replaceChild(dropClone, drop);
   const previewsEl = dropClone.querySelector(".previews");
-
-  let selectedFiles = [];
-
   function handleFiles(files) {
-    selectedFiles = Array.from(files || []);
     previewsEl.innerHTML = "";
-    selectedFiles.forEach((f) => {
+    Array.from(files).forEach((f) => {
       const p = document.createElement("div");
       p.className = "preview";
       p.textContent = `${f.name} (${Math.round(f.size / 1024)} KB)`;
       previewsEl.appendChild(p);
     });
   }
-
   dropClone.addEventListener("click", () => filesInput.click());
   dropClone.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -323,11 +347,12 @@ function openDrawer(materialId, materialName) {
       handleFiles(e.dataTransfer.files);
     }
   });
-  filesInput.addEventListener("change", () => {
-    if (filesInput.files) handleFiles(filesInput.files);
-  });
+  filesInput.addEventListener(
+    "change",
+    () => filesInput.files && handleFiles(filesInput.files)
+  );
 
-  /* ------ Open/close drawer ------ */
+  // Open/close drawer
   function close() {
     root.classList.remove("open");
   }
@@ -348,50 +373,16 @@ function openDrawer(materialId, materialName) {
   };
   window.addEventListener("keydown", onEsc);
 
-  /* ------ Submit → upload files → Stripe checkout ------ */
+  // Submit → Stripe checkout
   form.onsubmit = async (e) => {
     e.preventDefault();
-
-    // 1) Upload files to Supabase via Netlify function
-    const attachmentUrls = [];
-    if (selectedFiles.length) {
-      status.textContent = "Uploading files…";
-      for (const file of selectedFiles) {
-        try {
-          const metaRes = await fetch("/.netlify/functions/create-upload-url", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              filename: file.name,
-              contentType: file.type || "application/octet-stream",
-            }),
-          });
-          if (!metaRes.ok) throw new Error("Could not get upload URL");
-          const meta = await metaRes.json(); // { uploadUrl, publicUrl, contentType }
-
-          const putRes = await fetch(meta.uploadUrl, {
-            method: "PUT",
-            headers: { "Content-Type": meta.contentType },
-            body: file,
-          });
-          if (!putRes.ok) throw new Error("Upload failed");
-
-          attachmentUrls.push(meta.publicUrl);
-        } catch (err) {
-          console.error("Upload error:", err);
-          status.textContent =
-            "Upload failed for one or more files. Please try again.";
-          return;
-        }
-      }
-    }
-
-    // 2) Start checkout
     status.textContent = "Starting checkout…";
 
     const options = Array.from(
       optsWrap.querySelectorAll('input[type="checkbox"]:checked')
     ).map((cb) => cb.dataset.opt);
+
+    const filenames = Array.from(filesInput.files || []).map((f) => f.name);
 
     const payload = {
       materialId: matId.value,
@@ -405,9 +396,14 @@ function openDrawer(materialId, materialName) {
         email: form.email.value,
         phone: form.phone.value,
       },
-      shipTo: ship.value,
+      delivery: {
+        method: methodSel.value || "pickup", // "pickup" | "meet" | "ship"
+        feePerItem:
+          methodSel.value === "meet" ? 5 : methodSel.value === "ship" ? 10 : 0,
+      },
+      shipTo: ship ? ship.value : "",
       notes: form.details.value,
-      attachments: attachmentUrls, // now real URLs in Supabase
+      attachments: filenames, // filenames only (no upload yet)
     };
 
     try {

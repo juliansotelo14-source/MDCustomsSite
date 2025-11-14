@@ -1,545 +1,294 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Admin – Orders</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Netlify Identity widget -->
-    <script
-      defer
-      src="https://identity.netlify.com/v1/netlify-identity-widget.js"
-    ></script>
-    <style>
-      body {
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
-          sans-serif;
-        margin: 0;
-        background: #0b0d14;
-        color: #eef2f8;
-      }
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 16px;
-        background: #111628;
-        border-bottom: 1px solid #20283e;
-      }
-      button {
-        background: #e41c23;
-        color: #0b0d14;
-        border: none;
-        border-radius: 10px;
-        padding: 8px 12px;
-        font-weight: 700;
-        cursor: pointer;
-      }
-      .wrap {
-        width: min(1100px, 92%);
-        margin: 20px auto;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid #20283e;
-        background: #131829;
-        border-radius: 12px;
-        overflow: hidden;
-      }
-      th,
-      td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #20283e;
-        text-align: left;
-        color: #cbd5e1;
-      }
-      th {
-        background: #0f1320;
-        color: #fff;
-        position: sticky;
-        top: 0;
-      }
-      a {
-        color: #fff;
-      }
-      .muted {
-        color: #a7b1c7;
-      }
-      /* Debug bar */
-      .debug {
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        background: #1b2238;
-        border-bottom: 1px dashed #334066;
-        padding: 6px 10px;
-        font-size: 12px;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-      .pill {
-        padding: 2px 8px;
-        border-radius: 999px;
-        background: #20283e;
-        color: #cbd5e1;
-      }
-      .ok {
-        background: #19361c;
-        color: #b7ffbf;
-      }
-      .bad {
-        background: #3a1a1a;
-        color: #ffb7b7;
-      }
-      .debug button {
-        padding: 4px 8px;
-        border-radius: 8px;
-        background: #20283e;
-        color: #fff;
-        border: 1px solid #334066;
-        cursor: pointer;
-      }
-      .debug button:hover {
-        filter: brightness(1.1);
-      }
-      /* Artwork manager form */
-      #art-form {
-        margin-bottom: 20px;
-        display: grid;
-        gap: 10px;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        background: #111628;
-        padding: 16px;
-        border-radius: 12px;
-      }
-      #art-form label span {
-        font-size: 13px;
-        color: #a7b1c7;
-      }
-      #art-form input {
-        width: 100%;
-        margin-top: 4px;
-        border-radius: 8px;
-        border: 1px solid #20283e;
-        padding: 6px 8px;
-        background: #0b0d14;
-        color: #eef2f8;
-      }
-      #art-form button {
-        padding: 8px 14px;
-      }
-    </style>
+    <title>Hollywood MD Customs — Custom Signs & Prints</title>
+    <meta
+      name="description"
+      content="Vinyl, Aluminum, ACM (JBond), Acrylic, Posters, Magnets, Canvas, Banners, Business Cards, Yard Signs."
+    />
+    <link rel="icon" href="assets/img/logo.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
   </head>
   <body>
-    <div class="debug">
-      <span>Identity:</span>
-      <span id="idStatus" class="pill bad">NOT LOADED</span>
-      <button id="dbgLogin">Open Login</button>
-      <button id="dbgSignup">Open Signup</button>
-      <span id="hashInfo" class="pill"></span>
-    </div>
-
-    <header>
-      <strong>Hollywood MD Customs — Admin</strong>
-      <div>
-        <button id="loginBtn">Log in</button>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#">
+          <img
+            class="brand-mark"
+            src="assets/img/logo.png"
+            alt="Hollywood MD Customs logo"
+          />
+          <div class="brand-stack">
+            <span class="brand-top">Hollywood</span
+            ><span class="brand-bottom">MD Customs</span>
+          </div>
+        </a>
+        <nav id="site-nav" class="site-nav" aria-label="Primary">
+          <ul>
+            <li><a href="#materials">Materials</a></li>
+            <li><a href="#artwork">Artwork</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="/admin.html">Admin</a></li>
+          </ul>
+        </nav>
         <button
-          id="logoutBtn"
-          style="display: none; background: #20283e; color: #fff"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          aria-label="Toggle navigation"
         >
-          Log out
+          ☰
         </button>
       </div>
     </header>
 
-    <!-- ORDERS SECTION -->
-    <div class="wrap">
-      <h2>Orders</h2>
-      <p id="status">Please sign in to view orders.</p>
-      <div style="overflow: auto; max-height: calc(100vh - 180px)">
-        <table id="orders" style="display: none">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Customer</th>
-              <th>Contact</th>
-              <th>Material</th>
-              <th>Size</th>
-              <th>Qty</th>
-              <th>Total</th>
-              <th>Ship To</th>
-              <th>Attachments</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <main id="main">
+      <section class="hero">
+        <img
+          class="hero-bg"
+          src="assets/img/hero-bg.svg"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="container hero-wrap">
+          <div class="hero-copy">
+            <h1 class="display">
+              Custom Signs. <span class="accent">Bold Prints.</span>
+            </h1>
+            <p class="lead">
+              Premium signage and print work—designed for impact, built to last.
+            </p>
+            <div class="actions">
+              <a class="btn btn-primary" href="#materials"
+                >Start a Custom Order</a
+              >
+              <a class="btn" href="#artwork">Browse Artwork</a>
+            </div>
+          </div>
+          <div class="hero-logo">
+            <img src="assets/img/logo.png" alt="Shop emblem" loading="lazy" />
+          </div>
+        </div>
+      </section>
+
+      <section id="materials" class="section section-tight">
+        <div class="container">
+          <header class="section-head center">
+            <h2 class="section-title">Materials & Products</h2>
+            <p class="muted">
+              Click a material to customize, size and upload artwork.
+            </p>
+          </header>
+          <div id="materials-grid" class="grid products"></div>
+        </div>
+      </section>
+
+      <section id="artwork" class="section section-alt">
+        <div class="container">
+          <header class="section-head center">
+            <h2 class="section-title">Created Artwork for Sale</h2>
+            <p class="muted">
+              Limited designs and originals. New drops regularly.
+            </p>
+          </header>
+          <div id="gallery" class="grid gallery"></div>
+        </div>
+      </section>
+
+      <section id="about" class="section">
+        <div class="container narrow">
+          <header class="section-head center">
+            <h2 class="section-title">About</h2>
+          </header>
+          <p>
+            Hollywood MD Customs is your local sign and print shop focused on
+            clean design, rugged materials, and fast turnarounds.
+          </p>
+          <ul class="contact-cards">
+            <li>
+              <strong>Call</strong><br /><a href="tel:520-535-9289"
+                >520-535-9289</a
+              >
+            </li>
+            <li>
+              <strong>Email</strong><br /><a
+                href="mailto:Mike.devlieger7@gmail.com"
+                >Mike.devlieger7@gmail.com</a
+              >
+            </li>
+            <li>
+              <strong>Website</strong><br /><a
+                href="https://www.MDCustoms.com"
+                target="_blank"
+                rel="noopener"
+                >www.MDCustoms.com</a
+              >
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>
+          © <span id="year"></span> Hollywood MD Customs. All rights reserved.
+        </p>
+        <ul class="footer-links">
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
       </div>
+    </footer>
+
+    <!-- Drawer (Order) -->
+    <div id="mdc-drawer" class="mdc-drawer" aria-hidden="true">
+      <div
+        class="mdc-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mdc-drawer-title"
+      >
+        <button class="mdc-drawer__close" aria-label="Close">✕</button>
+        <header class="mdc-drawer__head">
+          <h3 id="mdc-drawer-title">Start Your Order</h3>
+          <p class="muted" id="mdc-drawer-sub">
+            Choose size, quantity, options, upload artwork, and shipping
+            preferences.
+          </p>
+        </header>
+
+        <form id="order-form" class="mdc-calc">
+          <input type="hidden" id="mdc-material-id" />
+          <input type="hidden" id="mdc-material-name" />
+
+          <div class="grid two">
+            <label
+              ><span>Full Name</span
+              ><input name="name" type="text" placeholder="Your name" required
+            /></label>
+            <label
+              ><span>Email</span
+              ><input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+            /></label>
+          </div>
+          <label
+            ><span>Phone</span
+            ><input name="phone" type="tel" placeholder="520-535-9289"
+          /></label>
+
+          <div class="grid two">
+            <label
+              ><span>Width (inches)</span
+              ><input
+                type="number"
+                id="mdc-w"
+                min="1"
+                step="0.25"
+                placeholder="24"
+                required
+            /></label>
+            <label
+              ><span>Height (inches)</span
+              ><input
+                type="number"
+                id="mdc-h"
+                min="1"
+                step="0.25"
+                placeholder="36"
+                required
+            /></label>
+          </div>
+          <label
+            ><span>Quantity</span
+            ><input type="number" id="mdc-q" min="1" value="1" required
+          /></label>
+
+          <fieldset id="mdc-opts" class="mdc-opts">
+            <legend>Options</legend>
+          </fieldset>
+
+          <label
+            ><span>Upload Artwork</span
+            ><input
+              id="mdc-files"
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.png,.pdf,.ai,.svg,.eps,.zip"
+          /></label>
+          <div class="dropzone" id="mdc-drop">
+            <div>Drag & drop files here, or click to select.</div>
+            <div class="previews"></div>
+          </div>
+
+          <!-- NEW: Delivery Method -->
+          <label>
+            <span>Delivery Method</span>
+            <select id="mdc-ship-method" required>
+              <option value="" disabled selected>Select an option</option>
+              <option value="pickup">Pickup (Free)</option>
+              <option value="meet">Meet-up ($5 per item)</option>
+              <option value="ship">Ship to address ($10 per item)</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Ship To Address</span>
+            <textarea
+              id="mdc-ship"
+              rows="4"
+              placeholder="Name&#10;Street address&#10;City, State ZIP&#10;Country"
+            ></textarea>
+          </label>
+
+          <label
+            ><span>Notes</span
+            ><textarea
+              name="details"
+              rows="4"
+              placeholder="Color notes, lamination, install, deadline…"
+            ></textarea>
+          </label>
+
+          <div class="mdc-est">
+            <div>
+              <div class="muted small">Est. Area</div>
+              <strong id="mdc-area">0.00 sq ft</strong>
+            </div>
+            <div>
+              <div class="muted small">Est. Total</div>
+              <strong id="mdc-price">$0.00</strong>
+            </div>
+            <div>
+              <div class="muted small">Per Item</div>
+              <strong id="mdc-each">$0.00</strong>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Checkout
+          </button>
+          <p
+            id="form-status"
+            class="muted"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+      </div>
+      <div class="mdc-drawer__backdrop"></div>
     </div>
 
-    <hr
-      style="margin: 32px auto; width: min(1100px, 92%); border-color: #20283e"
-    />
-
-    <!-- ARTWORK MANAGER SECTION -->
-    <section class="wrap">
-      <h2>Artwork Manager</h2>
-      <p class="muted">
-        Add or remove pieces from the public "Created Artwork for Sale" gallery.
-      </p>
-
-      <form id="art-form">
-        <label>
-          <span>Title</span><br />
-          <input type="text" name="title" required />
-        </label>
-        <label>
-          <span>Price (display)</span><br />
-          <input type="text" name="price" placeholder="$120" />
-        </label>
-        <label>
-          <span>Size</span><br />
-          <input type="text" name="size" placeholder='24" x 36"' />
-        </label>
-        <label>
-          <span>Materials (comma separated)</span><br />
-          <input type="text" name="materials" placeholder="Canvas, Acrylic" />
-        </label>
-        <label style="grid-column: 1 / -1">
-          <span>Image URL</span><br />
-          <input
-            type="url"
-            name="image_url"
-            placeholder="https://..."
-            required
-          />
-        </label>
-        <label style="grid-column: 1 / -1">
-          <span>Buy URL (optional)</span><br />
-          <input type="url" name="buy_url" placeholder="https://..." />
-        </label>
-        <div
-          style="
-            grid-column: 1 / -1;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-          "
-        >
-          <button type="submit">Add Artwork</button>
-          <span id="art-status" class="muted"></span>
-        </div>
-      </form>
-
-      <div style="overflow: auto; max-height: 400px">
-        <table
-          id="art-table"
-          style="
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #20283e;
-            background: #131829;
-            border-radius: 12px;
-            overflow: hidden;
-          "
-        >
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Price</th>
-              <th>Size</th>
-              <th>Materials</th>
-              <th>Image</th>
-              <th>Active</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <script>
-      const statusEl = document.getElementById("status");
-      const loginBtn = document.getElementById("loginBtn");
-      const logoutBtn = document.getElementById("logoutBtn");
-      const table = document.getElementById("orders");
-      const tbody = table.querySelector("tbody");
-
-      // Artwork manager handles
-      const artForm = document.getElementById("art-form");
-      const artStatus = document.getElementById("art-status");
-      const artTable = document.getElementById("art-table");
-      const artTbody = artTable ? artTable.querySelector("tbody") : null;
-
-      // Debug handles
-      const idStatus = document.getElementById("idStatus");
-      const dbgLogin = document.getElementById("dbgLogin");
-      const dbgSignup = document.getElementById("dbgSignup");
-      const hashInfo = document.getElementById("hashInfo");
-      hashInfo.textContent = location.hash || "";
-
-      let currentIdentity = null;
-
-      function setLoaded(ok) {
-        idStatus.textContent = ok ? "LOADED" : "NOT LOADED";
-        idStatus.className = "pill " + (ok ? "ok" : "bad");
-      }
-
-      function getIdentity() {
-        return new Promise((resolve) => {
-          (function check() {
-            if (
-              window.netlifyIdentity &&
-              typeof window.netlifyIdentity.on === "function"
-            ) {
-              resolve(window.netlifyIdentity);
-            } else {
-              setLoaded(false);
-              setTimeout(check, 80);
-            }
-          })();
-        });
-      }
-
-      function esc(s = "") {
-        return s
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-
-      async function getAuthHeaders() {
-        if (!currentIdentity) throw new Error("No identity");
-        const user = currentIdentity.currentUser();
-        if (!user) throw new Error("Not logged in");
-        const token = await user.jwt();
-        return {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        };
-      }
-
-      async function init() {
-        const id = await getIdentity();
-        currentIdentity = id;
-        setLoaded(true);
-
-        // Always init (safe)
-        if (typeof id.init === "function") id.init();
-
-        // Wire debug buttons
-        dbgLogin.onclick = () => id.open("login");
-        dbgSignup.onclick = () => id.open("signup");
-
-        // Wire header buttons
-        loginBtn.onclick = () => id.open("login");
-        logoutBtn.onclick = () => id.logout();
-
-        id.on("login", async () => {
-          loginBtn.style.display = "none";
-          logoutBtn.style.display = "inline-block";
-          id.close();
-          await loadOrdersWithAuth();
-          await loadAdminArtworks();
-        });
-
-        id.on("logout", () => {
-          loginBtn.style.display = "inline-block";
-          logoutBtn.style.display = "none";
-          statusEl.textContent = "Please sign in to view orders.";
-          table.style.display = "none";
-          tbody.innerHTML = "";
-          if (artTbody) artTbody.innerHTML = "";
-          if (artStatus)
-            artStatus.textContent = "Please sign in to manage artwork.";
-        });
-
-        id.on("init", async (user) => {
-          if (user) {
-            loginBtn.style.display = "none";
-            logoutBtn.style.display = "inline-block";
-            await loadOrdersWithAuth();
-            await loadAdminArtworks();
-          }
-        });
-      }
-
-      async function loadOrdersWithAuth() {
-        statusEl.textContent = "Loading orders…";
-        try {
-          if (!currentIdentity) {
-            statusEl.textContent = "Not logged in.";
-            return;
-          }
-          const user = currentIdentity.currentUser();
-          if (!user) {
-            statusEl.textContent = "Not logged in.";
-            return;
-          }
-          const token = await user.jwt();
-
-          const res = await fetch("/.netlify/functions/admin-list-orders", {
-            headers: { Authorization: "Bearer " + token },
-          });
-
-          if (!res.ok) {
-            statusEl.textContent = "Access denied or error loading orders.";
-            return;
-          }
-
-          const items = await res.json();
-          const rows = items
-            .map((o) => {
-              const total = (o.amount_total_cents || 0) / 100;
-              const att =
-                (o.attachments || "")
-                  .split("|")
-                  .filter(Boolean)
-                  .map((u) => `<div>${u}</div>`)
-                  .join("") || "-";
-              const ship = (o.ship_to_address || "").replace(/\n/g, "<br>");
-              return `<tr>
-              <td>${new Date(o.created_at).toLocaleString()}</td>
-              <td>${esc(o.customer_name || "")}</td>
-              <td>${esc(o.customer_email || "")}<br>${esc(o.phone || "")}</td>
-              <td>${esc(o.material_name || "")}</td>
-              <td>${Number(o.width_in || 0)}" × ${Number(
-                o.height_in || 0
-              )}"</td>
-              <td>${Number(o.quantity || 1)}</td>
-              <td>$${total.toFixed(2)} ${String(
-                o.currency || "USD"
-              ).toUpperCase()}</td>
-              <td class="muted">${ship || "-"}</td>
-              <td>${att}</td>
-              <td>${esc(o.status || "")}</td>
-            </tr>`;
-            })
-            .join("");
-
-          tbody.innerHTML = rows;
-          table.style.display = "table";
-          statusEl.textContent = "";
-        } catch (e) {
-          console.error(e);
-          statusEl.textContent = "Failed to load orders.";
-        }
-      }
-
-      // ===== Artwork Manager functions =====
-      async function loadAdminArtworks() {
-        if (!artTbody || !artStatus) return;
-        artStatus.textContent = "Loading artworks…";
-        try {
-          const headers = await getAuthHeaders();
-          // For GET, we don't need Content-Type
-          delete headers["Content-Type"];
-
-          const res = await fetch("/.netlify/functions/admin-artworks", {
-            headers,
-          });
-          if (!res.ok) {
-            artStatus.textContent = "Failed to load artworks.";
-            return;
-          }
-          const items = await res.json();
-          artTbody.innerHTML = items
-            .map(
-              (a) => `
-            <tr>
-              <td>${esc(a.title || "")}</td>
-              <td>${esc(a.price || "")}</td>
-              <td>${esc(a.size || "")}</td>
-              <td>${esc((a.materials || []).join(", "))}</td>
-              <td><a href="${esc(
-                a.image_url || "#"
-              )}" target="_blank" rel="noopener">View</a></td>
-              <td>${a.is_active ? "Yes" : "No"}</td>
-              <td>
-                <button data-art-id="${esc(
-                  a.id
-                )}" style="padding:4px 8px;font-size:12px;border-radius:8px;background:#20283e;color:#fff;border:1px solid #334066">
-                  Remove
-                </button>
-              </td>
-            </tr>`
-            )
-            .join("");
-          artStatus.textContent = "";
-        } catch (e) {
-          console.error(e);
-          artStatus.textContent = "Failed to load artworks.";
-        }
-      }
-
-      if (artForm && artStatus) {
-        artForm.onsubmit = async (e) => {
-          e.preventDefault();
-          artStatus.textContent = "Saving…";
-
-          const formData = new FormData(artForm);
-          const payload = {
-            title: formData.get("title"),
-            price: formData.get("price"),
-            size: formData.get("size"),
-            materials: String(formData.get("materials") || "")
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean),
-            image_url: formData.get("image_url"),
-            buy_url: formData.get("buy_url"),
-            is_active: true,
-          };
-
-          try {
-            const headers = await getAuthHeaders();
-            const res = await fetch("/.netlify/functions/admin-artworks", {
-              method: "POST",
-              headers,
-              body: JSON.stringify(payload),
-            });
-            if (!res.ok) throw new Error("Save failed");
-            artForm.reset();
-            artStatus.textContent = "Artwork added.";
-            await loadAdminArtworks();
-          } catch (e) {
-            console.error(e);
-            artStatus.textContent = "Failed to add artwork.";
-          }
-        };
-      }
-
-      if (artTbody && artStatus) {
-        artTbody.addEventListener("click", async (e) => {
-          const btn = e.target.closest("button[data-art-id]");
-          if (!btn) return;
-          const id = btn.getAttribute("data-art-id");
-          if (!id) return;
-          if (!confirm("Remove this artwork from the public gallery?")) return;
-
-          artStatus.textContent = "Removing…";
-          try {
-            const headers = await getAuthHeaders();
-            const res = await fetch("/.netlify/functions/admin-artworks", {
-              method: "DELETE",
-              headers,
-              body: JSON.stringify({ id }),
-            });
-            if (!res.ok) throw new Error("Delete failed");
-            artStatus.textContent = "Artwork removed.";
-            await loadAdminArtworks();
-          } catch (e) {
-            console.error(e);
-            artStatus.textContent = "Failed to remove artwork.";
-          }
-        });
-      }
-
-      init();
-    </script>
+    <script src="assets/js/main.js" defer></script>
   </body>
 </html>

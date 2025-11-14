@@ -3,12 +3,9 @@
     "id": "a1",
     "title": "Neon Route",
     "price": "$120",
-    "image": "assets/img/art/art-1.svg",
+    "image": "assets/img/art/artwork/neonroute.png",
     "size": "18\" \u00d7 24\"",
-    "materials": [
-      "Aluminum",
-      "Vinyl"
-    ],
+    "materials": ["Aluminum", "Vinyl"],
     "description": "ACM panel with gloss finish.",
     "buy_url": ""
   },
@@ -16,11 +13,9 @@
     "id": "a2",
     "title": "Blaze Grid",
     "price": "$90",
-    "image": "assets/img/art/art-2.svg",
+    "image": "assets/img/art/artwork/blazegrid.png",
     "size": "16\" \u00d7 20\"",
-    "materials": [
-      "Canvas"
-    ],
+    "materials": ["Canvas"],
     "description": "Canvas print, ready to hang.",
     "buy_url": ""
   },
@@ -28,11 +23,9 @@
     "id": "a3",
     "title": "Midnight Lines",
     "price": "$140",
-    "image": "assets/img/art/art-3.svg",
+    "image": "assets/img/art/artwork/midnightlines.png",
     "size": "24\" \u00d7 36\"",
-    "materials": [
-      "Acrylic"
-    ],
+    "materials": ["Acrylic"],
     "description": "Backlit friendly.",
     "buy_url": ""
   },
@@ -40,11 +33,9 @@
     "id": "a4",
     "title": "Signal Path",
     "price": "$75",
-    "image": "assets/img/art/art-4.svg",
+    "image": "assets/img/art/artwork/signalpath.png",
     "size": "12\" \u00d7 18\"",
-    "materials": [
-      "Poster"
-    ],
+    "materials": ["Poster"],
     "description": "Thick premium stock.",
     "buy_url": ""
   }

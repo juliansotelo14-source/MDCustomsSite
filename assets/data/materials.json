@@ -1,87 +1,74 @@
 [
   {
-    "id": "vinyl",
-    "name": "Vinyl",
-    "image": "assets/img/materials/vinyl.jpg",
-    "pricing": { "unit": "sqft", "rate": 9.99 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (panels)" }
-  },
-
-  {
-    "id": "aluminum-040",
-    "name": "Aluminum .040",
-    "image": "assets/img/materials/aluminum.jpg",
-    "pricing": { "unit": "sqin", "rate": 0.14 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (signs)" }
-  },
-  {
-    "id": "aluminum-080",
-    "name": "Aluminum .080",
-    "image": "assets/img/materials/aluminum.jpg",
-    "pricing": { "unit": "sqin", "rate": 0.22 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (signs)" }
-  },
-
-  {
-    "id": "jbond-3mm",
-    "name": "ACM (JBond) 3mm",
-    "image": "assets/img/materials/jbond.svg",
-    "pricing": { "unit": "sqin", "rate": 0.12 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (panels)" }
-  },
-  {
-    "id": "jbond-6mm",
-    "name": "ACM (JBond) 6mm",
-    "image": "assets/img/materials/jbond.svg",
-    "pricing": { "unit": "sqin", "rate": 0.18 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (panels)" }
-  },
-
-  {
     "id": "acrylic",
     "name": "Acrylic",
-    "image": "assets/img/materials/acrylic.jpg",
+    "image": "assets/img/art/materials/acrylic.png",
     "pricing": { "unit": "sqin", "rate": 0.2 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (panels)" }
+    "options": { "rounded_corners": 2.5, "standoffs": 4.0 },
+    "ui": { "showSize": true }
   },
-
+  {
+    "id": "aluminum_040",
+    "name": "Aluminum .040",
+    "image": "assets/img/art/materials/aluminum.png",
+    "pricing": { "unit": "sqin", "rate": 0.14 },
+    "options": { "rounded_corners": 2.0 },
+    "ui": { "showSize": true }
+  },
+  {
+    "id": "aluminum_080",
+    "name": "Aluminum .080",
+    "image": "assets/img/art/materials/aluminum.png",
+    "pricing": { "unit": "sqin", "rate": 0.22 },
+    "options": { "rounded_corners": 2.0 },
+    "ui": { "showSize": true }
+  },
+  {
+    "id": "jbond_3mm",
+    "name": "ACM (JBond) 3mm",
+    "image": "assets/img/art/materials/jbond.png",
+    "pricing": { "unit": "sqin", "rate": 0.12 },
+    "options": { "rounded_corners": 2.0 },
+    "ui": { "showSize": true }
+  },
+  {
+    "id": "jbond_6mm",
+    "name": "ACM (JBond) 6mm",
+    "image": "assets/img/art/materials/jbond.png",
+    "pricing": { "unit": "sqin", "rate": 0.18 },
+    "options": { "rounded_corners": 2.0 },
+    "ui": { "showSize": true }
+  },
   {
     "id": "magnets",
     "name": "Magnets",
-    "image": "assets/img/materials/magnets.jpg",
+    "image": "assets/img/art/materials/magnet.png",
     "pricing": { "unit": "sqin", "rate": 0.14 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (sets)" }
+    "options": { "rounded_corners": 1.5 },
+    "ui": { "showSize": true }
   },
-
   {
-    "id": "banners",
-    "name": "Banners",
-    "image": "assets/img/materials/banners.jpg",
-    "pricing": { "unit": "sqft", "rate": 7.0 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (banners)" }
-  },
-
-  {
-    "id": "business-cards-regular",
-    "name": "Business Cards — Regular",
-    "image": "assets/img/materials/business-cards.jpg",
+    "id": "business_cards_regular",
+    "name": "Business Cards (Regular)",
+    "image": "assets/img/art/materials/businesscard.png",
     "pricing": { "unit": "per_sheet", "rate": 4.0, "items_per_sheet": 72 },
-    "ui": { "showSize": false, "quantityLabel": "Sheets (72 cards each)" }
+    "options": { "spot_gloss": 3.0 },
+    "ui": { "showSize": false, "quantityLabel": "Sheets" }
   },
-
   {
-    "id": "business-cards-metal",
-    "name": "Business Cards — Metal (with case)",
-    "image": "assets/img/materials/business-cards.jpg",
+    "id": "metal_cards",
+    "name": "Metal Cards (55 + case)",
+    "image": "assets/img/art/materials/metalbusinesscard.png",
     "pricing": { "unit": "per_pack", "rate": 11.0, "items_per_pack": 55 },
-    "ui": { "showSize": false, "quantityLabel": "Packs (55 cards each)" }
+    "options": {},
+    "ui": { "showSize": false, "quantityLabel": "Packs" }
   },
-
   {
-    "id": "yard-signs",
-    "name": "Yard Signs",
-    "image": "assets/img/materials/yard-signs.jpg",
-    "pricing": { "unit": "sqft", "rate": 9.0 },
-    "ui": { "showSize": true, "quantityLabel": "Quantity (signs)" }
+    "id": "vinyl",
+    "name": "Vinyl",
+    "image": "assets/img/art/materials/vinyl.png",
+    "pricing": { "unit": "sqft", "rate": 9.99 },
+    "options": { "laminate": 1.25 },
+    "ui": { "showSize": true }
   }
 ]
